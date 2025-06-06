@@ -8,7 +8,7 @@
         </p>
       </div>
       <div class="card-row">
-        <v-card class="profile-card">
+        <v-card v-if="canCreatePerson" class="profile-card">
           <div class="card-content">
             <h2 class="card-title">Perfil de Pessoa</h2>
             <p class="card-desc">
@@ -24,7 +24,8 @@
             </v-btn>
           </div>
         </v-card>
-        <v-card class="profile-card">
+
+        <v-card v-if="canCreateCompany" class="profile-card">
           <div class="card-content">
             <h2 class="card-title">Perfil de Empresa</h2>
             <p class="card-desc">
@@ -49,16 +50,15 @@
   </div>
 </template>
 
-
 <script setup>
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
-import { onBeforeMount, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 definePage({
   meta: {
-    title: 'default',
-    requireAuth: true, // opcional, só pra meta info
+    title: 'Selecionar Perfil',
+    requireAuth: true,
   }
 })
 
@@ -68,14 +68,14 @@ const router = useRouter()
 const canCreatePerson = ref(true)
 const canCreateCompany = ref(true)
 
-onBeforeMount(() => {
+onMounted(async () => {
+  // Se não tiver token, redireciona pro login
   if (!auth.token) {
     router.replace('/signin')
+    return
   }
-})
 
-onMounted(async () => {
-  // Se não carregou o user ainda, busca!
+  // Se não carregou o usuário, busca!
   if (!auth.user) {
     await auth.fetchUser()
   }
@@ -88,8 +88,8 @@ onMounted(async () => {
     router.push('/dashboard')
   }
 })
-
 </script>
+
 
 <style scoped>
 .profile-select-wrapper {

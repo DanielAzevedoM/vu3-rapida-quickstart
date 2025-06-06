@@ -41,10 +41,9 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted, onBeforeMount } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
-import { onBeforeMount } from 'vue'
 import AbaPrincipais from '@/components/formTabs/AbaPrincipais.vue'
 import AbaDocumentos from '@/components/formTabs/AbaDocumentos.vue'
 import AbaContatosRedes from '@/components/formTabs/AbaContatosRedes.vue'
@@ -54,7 +53,6 @@ import AbaBancarios from '@/components/formTabs/AbaBancarios.vue'
 
 const activeTab = ref(0)
 const loading = ref(false)
-
 const router = useRouter()
 const auth = useAuthStore()
 
@@ -63,79 +61,73 @@ const snackbarText = ref('')
 const snackbarColor = ref('error')
 const snackbarTimeout = 3500
 
-onBeforeMount(() => {
-  if (!auth.token) {
-    router.replace('/signin')
-  }
-})
-
 const form = reactive({
-    personName: "",
-    personNickname: "",
-    gender: "",
-    birthday: undefined,
-    maritalStatus: "",
-    motherName: "",
-    fatherName: "",
-    personDescription: "",
-    tagId: [],
+  personName: "",
+  personNickname: "",
+  gender: "",
+  birthday: undefined,
+  maritalStatus: "",
+  motherName: "",
+  fatherName: "",
+  personDescription: "",
+  tagId: [],
 
-    // Documents
-    cpf: "",
-    cpfFile: null,
-    rg: "",
-    rgIssuingAuthority: "",
-    rgIssuanceDate: undefined,
-    rgState: "",
-    rgFile: null,
-    passport: "",
-    passportIssuanceDate: undefined,
-    passportExpirationDate: undefined,
-    passportFile: null,
+  // Documents
+  cpf: "",
+  cpfFile: null,
+  rg: "",
+  rgIssuingAuthority: "",
+  rgIssuanceDate: undefined,
+  rgState: "",
+  rgFile: null,
+  passport: "",
+  passportIssuanceDate: undefined,
+  passportExpirationDate: undefined,
+  passportFile: null,
 
-    // Contacts
-    phoneNumberOne: "",
-    phoneNumberTwo: "",
-    emailOne: "",
-    emailTwo: "",
-    linkedin: "",
-    instagram: "",
-    facebook: "",
-    x: "",
+  // Contacts
+  phoneNumberOne: "",
+  phoneNumberTwo: "",
+  emailOne: "",
+  emailTwo: "",
+  linkedin: "",
+  instagram: "",
+  facebook: "",
+  x: "",
 
-    // Addresses
-    addressOneCepBrasilApi: "",
-    addressOneType: "",
-    addressOneStreet: "",
-    addressOneNumber: "",
-    addressOneComplement: "",
-    addressOneCity: "",
-    addressOneState: "",
-    addressTwoCepBrasilApi: "",
-    addressTwoType: "",
-    addressTwoStreet: "",
-    addressTwoNumber: "",
-    addressTwoComplement: "",
-    addressTwoCity: "",
-    addressTwoState: "",
+  // Addresses
+  addressOneCepBrasilApi: "",
+  addressOneType: "",
+  addressOneStreet: "",
+  addressOneNumber: "",
+  addressOneComplement: "",
+  addressOneCity: "",
+  addressOneState: "",
+  addressTwoCepBrasilApi: "",
+  addressTwoType: "",
+  addressTwoStreet: "",
+  addressTwoNumber: "",
+  addressTwoComplement: "",
+  addressTwoCity: "",
+  addressTwoState: "",
 
-    // Education
-    personEducation: "",
-    personLanguages: [],
+  // Education
+  personEducation: "",
+  personLanguages: [],
 
-    // Banking
-    bankDataOne: {
-      bankName: "",
-      bankBranch: "",
-      bankAccount: "",
-      bankAccountType: "",
-    },
-    bankDataTwo: {
-      bankName: "",
-      bankBranch: "",
-      bankAccount: "",
-      bankAccountType: "",
-    },
+  // Banking
+  bankDataOne: {
+    bankName: "",
+    bankBranch: "",
+    bankAccount: "",
+    bankAccountType: "",
+  },
+  bankDataTwo: {
+    bankName: "",
+    bankBranch: "",
+    bankAccount: "",
+    bankAccountType: "",
+  },
 })
 
 const tabs = [
@@ -146,6 +138,39 @@ const tabs = [
   { label: 'Formação', component: AbaFormacao },
   { label: 'Dados Bancários', component: AbaBancarios }
 ]
+
+onBeforeMount(() => {
+  if (!auth.token) {
+    router.replace('/signin')
+  }
+})
+
+onMounted(async () => {
+  if (!auth.user) {
+    console.log('User não carregado, buscando agora...')
+    await auth.fetchUser()
+  }
+
+  await checkProfile()
+})
+
+async function checkProfile() {
+  if (!auth.token || !auth.user) return
+  try {
+    const res = await fetch('http://localhost:3000/users/has-profile', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    const data = await res.json()
+    console.log('Checagem de perfil:', data)
+
+    if (data.person) {
+      console.log('Usuário já tem perfil de pessoa! Redirecionando...')
+      router.replace('/dashboard')
+    }
+  } catch (error) {
+    console.error('Erro ao checar perfil:', error)
+  }
+}
 
 function cancelar() {
   router.push('/profile/select')
@@ -159,51 +184,63 @@ function showError(msg) {
 
 function showSuccess(msg) {
   snackbarText.value = msg
-  snackbarColor.value = 'Success'
+  snackbarColor.value = 'success'
   showSnackbar.value = true
 }
 
 function validarCamposObrigatorios() {
   if (!form.personName.trim()) return 'Nome completo é obrigatório.'
   if (!form.gender.trim()) return 'Gênero é obrigatório.'
-  if (!form.birthday.trim()) return 'Data de nascimento é obrigatória.'
+  if (!form.birthday) return 'Data de nascimento é obrigatória.'
   if (form.tagId.length === 0) return 'Escolha pelo menos um interesse.'
-  // ...adicione as outras obrigatórias
   return ''
 }
 
 async function enviar() {
-    console.log(auth.token)
   const erro = validarCamposObrigatorios()
   if (erro) {
     showError(erro)
     return
   }
+
+  // Garante que o userId seja correto
+  if (!auth.user) {
+    await auth.fetchUser()
+  }
+  form.userId = auth.user?._id || ''
+
+  console.log('Enviando perfil:', form)
+
   loading.value = true
   try {
-    form.userId = auth.userId || "fake"
-    await fetch('http://localhost:3000/person-profiles', {
+    const res = await fetch('http://localhost:3000/person-profiles', {
       method: 'POST',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${auth.token}`,
-        'Content-Type': 'application/json' },
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(form)
     })
 
-    
-    snackbarText.value = 'Perfil salvo com sucesso!'
-    snackbarColor.value = 'success'
-    showSnackbar.value = true
+    if (!res.ok) {
+      const data = await res.json()
+      throw new Error(data.message || 'Erro ao salvar perfil')
+    }
+
     showSuccess('Perfil salvo com sucesso!')
-   
+    // Após salvar com sucesso, redireciona para o dashboard
+    setTimeout(() => {
+      router.replace('/dashboard')
+    }, 1000)
   } catch (err) {
-    showError('Erro ao salvar perfil')
+    showError(err.message || 'Erro ao salvar perfil')
   } finally {
     loading.value = false
   }
 }
-
 </script>
+
+
 
 <style scoped>
 .profile-form-container {
