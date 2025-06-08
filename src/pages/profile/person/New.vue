@@ -133,7 +133,7 @@ const tabs = [
 
 onBeforeMount(() => {
   if (!auth.token) {
-    router.replace('/signin')
+    router.replace('/auth/signin')
   }
 })
 

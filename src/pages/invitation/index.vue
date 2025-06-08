@@ -97,7 +97,7 @@ const snackbarTimeout = 3000
 
 onMounted(async () => {
   if (!auth.token) {
-    router.replace('/signin')
+    router.replace('/auth/signin')
     return
   }
 

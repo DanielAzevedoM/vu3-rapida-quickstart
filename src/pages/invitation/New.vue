@@ -82,7 +82,7 @@ const roles = ['Admin', 'Editor', 'Visualizador']
 
 onMounted(async () => {
   if (!auth.token) {
-    router.replace('/signin')
+    router.replace('/auth/signin')
     return
   }
 

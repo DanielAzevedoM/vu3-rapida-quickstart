@@ -114,14 +114,13 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router' 
 
 definePage({
   meta: {
     title: 'Login - Rápida Quickstart',
-    layout: 'default',
   },
 })
 
@@ -152,6 +151,12 @@ async function handleLogin() {
     showError("Preencha todos os campos!")
     return
   }
+
+  if (!form.email.includes('@')) {
+    showError("Email inválido!")
+    return
+  }
+
   await auth.login(form.email, form.password)
   if (!auth.error) {
     window.location.href = '/dashboard'
@@ -160,6 +165,7 @@ async function handleLogin() {
   }
 }
 </script>
+
 
 <style scoped>
 .v-container-style {

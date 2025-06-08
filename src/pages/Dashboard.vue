@@ -50,7 +50,7 @@ const profileName = ref('')
 
 onMounted(async () => {
   if (!auth.token) {
-    router.replace('/signin')
+    router.replace('/auth/signin')
     return
   }
 

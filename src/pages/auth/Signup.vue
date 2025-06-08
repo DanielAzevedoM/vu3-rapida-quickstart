@@ -53,7 +53,7 @@
         </v-form>
         <div class="mt-4 mb-1" style="font-size: 0.99rem; color: #a3a3a3">
           Já tem uma conta?
-          <a class="register-link" href="/signin">Fazer login</a>
+          <a class="register-link" href="/auth/signin">Fazer login</a>
         </div>
       </template>
 
@@ -68,7 +68,7 @@
         </div>
         <div class="mt-4 mb-1" style="font-size: 0.99rem; color: #a3a3a3">
           Já tem uma conta?
-          <a class="register-link" href="/signin">Fazer login</a>
+          <a class="register-link" href="/auth/signin">Fazer login</a>
         </div>
       </template>
     </v-card>

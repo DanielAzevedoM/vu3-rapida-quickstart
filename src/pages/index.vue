@@ -4,8 +4,8 @@
       <h1 class="text-h2 font-weight-bold mb-4">Gerenciamento de Perfis com Autenticação Segura</h1>
       <p>Uma plataforma completa para gerenciar perfis de pessoas e empresas, com autenticação multi-provider e controle de funções.</p>
       <div class="btn-div">
-        <v-btn class="text-white text-none custom-btn" to="/signin">Entrar na plataforma</v-btn>
-        <v-btn class="text-white text-none custom-btn-outlined" variant="outlined" to="/signup">Criar uma conta</v-btn>
+        <v-btn class="text-white text-none custom-btn" to="/auth/signin">Entrar na plataforma</v-btn>
+        <v-btn class="text-white text-none custom-btn-outlined" variant="outlined" to="/auth/signup">Criar uma conta</v-btn>
       </div> 
     </div>
   </v-container>

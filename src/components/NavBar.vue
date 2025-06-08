@@ -33,8 +33,8 @@
 
           <template v-else>
             <v-btn class="text-white text-none rounded-btn" to="/">Início</v-btn>
-            <v-btn class="text-white text-none rounded-btn" to="/signup">Criar conta</v-btn>
-            <v-btn class="text-white text-none rounded-btn" to="/signin">Login</v-btn>
+            <v-btn class="text-white text-none rounded-btn" to="/auth/signup">Criar conta</v-btn>
+            <v-btn class="text-white text-none rounded-btn" to="/auth/signin">Login</v-btn>
           </template>
         </template>
       </div>
@@ -158,7 +158,7 @@ function navigateTo(route) {
 
 function logoutAndRedirect() {
   auth.logout()
-  router.replace('/')
+  window.location.href = '/'
 }
 </script>
 
