@@ -1,9 +1,9 @@
 <template>
-  <div v-if="!checkingProfile"  class="profile-form-container">
-    <h1>Criar Perfil de Pessoa</h1>
+  <div v-if="!checkingProfile" class="profile-form-container">
+    <h1>Editar Perfil de Pessoa</h1>
     <p class="subtitle">
-      Preencha o formulário abaixo para criar seu perfil de pessoa.
-      Os campos marcados com <span class="required">*</span> são obrigatórios.
+      Edite as informações do seu perfil de pessoa. Os campos marcados com
+      <span class="required">*</span> são obrigatórios.
     </p>
 
     <!-- Tabs -->
@@ -26,24 +26,23 @@
       </v-btn>
     </div>
 
-        <v-snackbar
-    v-model="showSnackbar"
-    :color="snackbarColor"
-    :timeout="snackbarTimeout"
-    location="top center"
-    rounded="lg"
-    class="custom-snackbar"
+    <v-snackbar
+      v-model="showSnackbar"
+      :color="snackbarColor"
+      :timeout="snackbarTimeout"
+      location="top center"
+      rounded="lg"
+      class="custom-snackbar"
     >
-    {{ snackbarText }}
+      {{ snackbarText }}
     </v-snackbar>
-
   </div>
 </template>
 
 <script setup>
 import { reactive, ref, onMounted, onBeforeMount } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import AbaPrincipais from '@/components/formTabs/AbaPrincipais.vue'
 import AbaDocumentos from '@/components/formTabs/AbaDocumentos.vue'
 import AbaContatosRedes from '@/components/formTabs/AbaContatosRedes.vue'
@@ -53,10 +52,12 @@ import AbaBancarios from '@/components/formTabs/AbaBancarios.vue'
 
 const activeTab = ref(0)
 const loading = ref(false)
-const checkingProfile = ref(true) // 🚀 nova flag para controle de renderização
+const checkingProfile = ref(true)
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
+const id = route.params.id
 
 const showSnackbar = ref(false)
 const snackbarText = ref('')
@@ -64,61 +65,61 @@ const snackbarColor = ref('error')
 const snackbarTimeout = 3500
 
 const form = reactive({
-  personName: "",
-  personNickname: "",
-  gender: "",
+  personName: '',
+  personNickname: '',
+  gender: '',
   birthday: undefined,
-  maritalStatus: "",
-  motherName: "",
-  fatherName: "",
-  personDescription: "",
+  maritalStatus: '',
+  motherName: '',
+  fatherName: '',
+  personDescription: '',
   tagId: [],
-  cpf: "",
+  cpf: '',
   cpfFile: null,
-  rg: "",
-  rgIssuingAuthority: "",
+  rg: '',
+  rgIssuingAuthority: '',
   rgIssuanceDate: undefined,
-  rgState: "",
+  rgState: '',
   rgFile: null,
-  passport: "",
+  passport: '',
   passportIssuanceDate: undefined,
   passportExpirationDate: undefined,
   passportFile: null,
-  phoneNumberOne: "",
-  phoneNumberTwo: "",
-  emailOne: "",
-  emailTwo: "",
-  linkedin: "",
-  instagram: "",
-  facebook: "",
-  x: "",
-  addressOneCepBrasilApi: "",
-  addressOneType: "",
-  addressOneStreet: "",
-  addressOneNumber: "",
-  addressOneComplement: "",
-  addressOneCity: "",
-  addressOneState: "",
-  addressTwoCepBrasilApi: "",
-  addressTwoType: "",
-  addressTwoStreet: "",
-  addressTwoNumber: "",
-  addressTwoComplement: "",
-  addressTwoCity: "",
-  addressTwoState: "",
-  personEducation: "",
+  phoneNumberOne: '',
+  phoneNumberTwo: '',
+  emailOne: '',
+  emailTwo: '',
+  linkedin: '',
+  instagram: '',
+  facebook: '',
+  x: '',
+  addressOneCepBrasilApi: '',
+  addressOneType: '',
+  addressOneStreet: '',
+  addressOneNumber: '',
+  addressOneComplement: '',
+  addressOneCity: '',
+  addressOneState: '',
+  addressTwoCepBrasilApi: '',
+  addressTwoType: '',
+  addressTwoStreet: '',
+  addressTwoNumber: '',
+  addressTwoComplement: '',
+  addressTwoCity: '',
+  addressTwoState: '',
+  personEducation: '',
   personLanguages: [],
   bankDataOne: {
-    bankName: "",
-    bankBranch: "",
-    bankAccount: "",
-    bankAccountType: "",
+    bankName: '',
+    bankBranch: '',
+    bankAccount: '',
+    bankAccountType: '',
   },
   bankDataTwo: {
-    bankName: "",
-    bankBranch: "",
-    bankAccount: "",
-    bankAccountType: "",
+    bankName: '',
+    bankBranch: '',
+    bankAccount: '',
+    bankAccountType: '',
   },
 })
 
@@ -128,7 +129,7 @@ const tabs = [
   { label: 'Contatos e Redes', component: AbaContatosRedes },
   { label: 'Endereços', component: AbaEnderecos },
   { label: 'Formação', component: AbaFormacao },
-  { label: 'Dados Bancários', component: AbaBancarios }
+  { label: 'Dados Bancários', component: AbaBancarios },
 ]
 
 onBeforeMount(() => {
@@ -141,29 +142,49 @@ onMounted(async () => {
   if (!auth.user) {
     await auth.fetchUser()
   }
-  await checkProfile()
+  await checkAndLoadProfile()
 })
 
-async function checkProfile() {
+async function checkAndLoadProfile() {
   try {
-    const res = await fetch('http://localhost:3000/users/has-profile', {
-      headers: { Authorization: `Bearer ${auth.token}` }
+    const res = await fetch(`http://localhost:3000/person-profiles/${id}`, {
+      headers: { Authorization: `Bearer ${auth.token}` },
     })
-    const data = await res.json()
-    console.log('Checagem de perfil:', data)
 
-    if (data.person) {
-      router.replace('/dashboard')
-    } else {
-      checkingProfile.value = false // ✅ Liberar renderização do formulário
+    if (!res.ok) throw new Error('Erro ao buscar perfil')
+
+    const profile = await res.json()
+
+    // ✅ Ajusta as datas para YYYY-MM-DD
+    if (profile.birthday) {
+      profile.birthday = profile.birthday.split('T')[0]
     }
+    if (profile.rgIssuanceDate) {
+      profile.rgIssuanceDate = profile.rgIssuanceDate.split('T')[0]
+    }
+    if (profile.passportIssuanceDate) {
+      profile.passportIssuanceDate = profile.passportIssuanceDate.split('T')[0]
+    }
+    if (profile.passportExpirationDate) {
+      profile.passportExpirationDate = profile.passportExpirationDate.split('T')[0]
+    }
+
+    // ✅ Remove campos que não devem ser atualizados
+    delete profile._id
+    delete profile.createdAt
+    delete profile.updatedAt
+    delete profile.__v
+
+    Object.assign(form, profile)
   } catch (error) {
-    console.error('Erro ao checar perfil:', error)
+    console.error('Erro ao carregar perfil:', error)
+  } finally {
+    checkingProfile.value = false
   }
 }
 
 function cancelar() {
-  router.push('/profile/select')
+  router.push('/dashboard')
 }
 
 function showError(msg) {
@@ -196,17 +217,16 @@ async function enviar() {
   if (!auth.user) {
     await auth.fetchUser()
   }
-  form.userId = auth.user?._id || ''
 
   loading.value = true
   try {
-    const res = await fetch('http://localhost:3000/person-profiles', {
-      method: 'POST',
+    const res = await fetch(`http://localhost:3000/person-profiles/${id}`, {
+      method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${auth.token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${auth.token}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(form)
+      body: JSON.stringify(form),
     })
 
     if (!res.ok) {
@@ -214,7 +234,7 @@ async function enviar() {
       throw new Error(data.message || 'Erro ao salvar perfil')
     }
 
-    showSuccess('Perfil salvo com sucesso!')
+    showSuccess('Perfil atualizado com sucesso!')
     setTimeout(() => {
       window.location.href = '/dashboard'
     }, 1000)
@@ -225,7 +245,6 @@ async function enviar() {
   }
 }
 </script>
-
 
 <style scoped>
 .profile-form-container {
@@ -250,7 +269,8 @@ async function enviar() {
   gap: 18px;
   margin-top: 30px;
 }
-.save-btn, .cancel-btn {
+.save-btn,
+.cancel-btn {
   min-width: 120px;
   font-weight: 600;
   border-radius: 0.5rem !important;

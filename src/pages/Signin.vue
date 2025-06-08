@@ -154,8 +154,7 @@ async function handleLogin() {
   }
   await auth.login(form.email, form.password)
   if (!auth.error) {
-    
-    router.push('/profile/select')
+    window.location.href = '/dashboard'
   } else {
     showError("Usuário ou senha incorretos!")
   }

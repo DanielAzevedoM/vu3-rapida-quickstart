@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-select-wrapper">
+  <div v-if="!checkingProfile" class="profile-select-wrapper">
     <div class="profile-center-content">
       <div class="header-area">
         <h1>Bem-vindo à Plataforma</h1>
@@ -35,7 +35,6 @@
               class="profile-btn"
               color="#4f02ff"
               size="large"
-              
             >
               Criar Perfil de Empresa
             </v-btn>
@@ -67,29 +66,40 @@ const router = useRouter()
 
 const canCreatePerson = ref(true)
 const canCreateCompany = ref(true)
+const checkingProfile = ref(true) // 🔥 Adiciona esse flag para controlar o carregamento
 
 onMounted(async () => {
-  // Se não tiver token, redireciona pro login
   if (!auth.token) {
     router.replace('/signin')
     return
   }
 
-  // Se não carregou o usuário, busca!
   if (!auth.user) {
     await auth.fetchUser()
   }
 
-  const userRoles = auth.user?.availableRoles || []
-  canCreatePerson.value = !userRoles.includes('person')
-  canCreateCompany.value = !userRoles.includes('company')
+  try {
+    const res = await fetch('http://localhost:3000/users/has-profile', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    const data = await res.json()
+    console.log('Checagem de perfil:', data)
 
-  if (!canCreatePerson.value && !canCreateCompany.value) {
-    router.push('/dashboard')
+    if (data.person || data.company) {
+      console.log('Perfil já existente. Redirecionando para dashboard.')
+      router.replace('/dashboard')
+      return
+    }
+
+    canCreatePerson.value = true
+    canCreateCompany.value = true
+  } catch (error) {
+    console.error('Erro ao checar perfil:', error)
+  } finally {
+    checkingProfile.value = false // ✅ Só exibe o template depois disso
   }
 })
 </script>
-
 
 <style scoped>
 .profile-select-wrapper {
