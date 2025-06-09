@@ -49,7 +49,7 @@
 definePage({
   meta: {
     title: 'Rápida Quickstart - Plataforma de gerenciamento de perfis',
-    layout: 'default',
+
   },
 })
 </script>

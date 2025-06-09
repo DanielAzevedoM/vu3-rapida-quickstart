@@ -56,7 +56,7 @@ import { onMounted, ref } from 'vue'
 
 definePage({
   meta: {
-    title: 'Selecionar Perfil',
+    title: 'Selecionar Perfil - Rápida Quickstart',
     requireAuth: true,
   }
 })

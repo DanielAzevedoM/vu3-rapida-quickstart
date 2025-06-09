@@ -62,6 +62,12 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 
+definePage({
+  meta: {
+    title: 'Criar Convite - Rápida Quickstart',
+  },
+})
+
 const auth = useAuthStore()
 const router = useRouter()
 

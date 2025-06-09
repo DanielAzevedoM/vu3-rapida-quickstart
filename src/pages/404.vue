@@ -11,7 +11,6 @@ definePage({
   path: '/:pathMatch(.*)*',
   meta: {
     title: '404 - Rápida Quickstart',
-    layout: 'default',
   },
 })
 </script>

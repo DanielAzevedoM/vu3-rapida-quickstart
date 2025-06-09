@@ -86,6 +86,12 @@
 import { reactive, ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
+definePage({
+  meta: {
+    title: 'Completar Registro - Rápida Quickstart',
+  },
+})
+
 const form = reactive({
   email: "",
   password: "",

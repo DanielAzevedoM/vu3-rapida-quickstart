@@ -86,7 +86,6 @@ import { useAuthStore } from '@/stores/authStore'
 definePage({
   meta: {
     title: 'Criar Conta - Rápida Quickstart',
-    Layout: 'default',
   }
 })
 

@@ -50,6 +50,13 @@ import AbaContatosRedes from '@/components/formTabs/AbaContatosRedes.vue'
 import AbaEnderecos from '@/components/formTabs/AbaEnderecos.vue'
 import AbaFormacao from '@/components/formTabs/AbaFormacao.vue'
 import AbaBancarios from '@/components/formTabs/AbaBancarios.vue'
+import { user } from '@/utils/personFormFields'
+
+definePage({
+  meta: {
+    title: 'Criar Perfil de Pessoa - Rápida Quickstart',
+  },
+})
 
 const activeTab = ref(0)
 const loading = ref(false)
@@ -63,64 +70,7 @@ const snackbarText = ref('')
 const snackbarColor = ref('error')
 const snackbarTimeout = 3500
 
-const form = reactive({
-  personName: "",
-  personNickname: "",
-  gender: "",
-  birthday: undefined,
-  maritalStatus: "",
-  motherName: "",
-  fatherName: "",
-  personDescription: "",
-  tagId: [],
-  cpf: "",
-  cpfFile: null,
-  rg: "",
-  rgIssuingAuthority: "",
-  rgIssuanceDate: undefined,
-  rgState: "",
-  rgFile: null,
-  passport: "",
-  passportIssuanceDate: undefined,
-  passportExpirationDate: undefined,
-  passportFile: null,
-  phoneNumberOne: "",
-  phoneNumberTwo: "",
-  emailOne: "",
-  emailTwo: "",
-  linkedin: "",
-  instagram: "",
-  facebook: "",
-  x: "",
-  addressOneCepBrasilApi: "",
-  addressOneType: "",
-  addressOneStreet: "",
-  addressOneNumber: "",
-  addressOneComplement: "",
-  addressOneCity: "",
-  addressOneState: "",
-  addressTwoCepBrasilApi: "",
-  addressTwoType: "",
-  addressTwoStreet: "",
-  addressTwoNumber: "",
-  addressTwoComplement: "",
-  addressTwoCity: "",
-  addressTwoState: "",
-  personEducation: "",
-  personLanguages: [],
-  bankDataOne: {
-    bankName: "",
-    bankBranch: "",
-    bankAccount: "",
-    bankAccountType: "",
-  },
-  bankDataTwo: {
-    bankName: "",
-    bankBranch: "",
-    bankAccount: "",
-    bankAccountType: "",
-  },
-})
+const form = reactive({ ...user })
 
 const tabs = [
   { label: 'Dados Principais', component: AbaPrincipais },
