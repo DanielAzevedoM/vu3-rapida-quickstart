@@ -4,8 +4,9 @@
   <v-main>
     <router-view />
   </v-main>
-
+  
   <Footer></Footer>
+
 </template> 
 
 <script setup>
@@ -13,6 +14,7 @@
 </script>
 <style scoped>
 .v-main{
-  height: 100vh;
+  min-height: 993px;
 }
+
 </style>

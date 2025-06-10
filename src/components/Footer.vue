@@ -88,10 +88,31 @@
   font-size: 1.1rem;
 }
 @media (max-width: 900px) {
-  .pre-footer-title { font-size: 1.1rem;}
-  .pre-footer-desc { font-size: 0.95rem;}
-  .pre-footer-container { padding-top: 1.4rem; padding-bottom: 1.4rem;}
+  .pre-footer-container {
+    width: 100%;
+    text-align: center;
+    padding-top: 1.4rem;
+    padding-bottom: 1.4rem;
+  }
+  .pre-footer-title {
+    font-size: 1.3rem;
+    margin-left: 0;
+  }
+  .pre-footer-desc {
+    font-size: 0.95rem;
+    margin-left: 0;
+  }
+  .footer-label {
+    margin-top: 1rem;
+  }
+  .v-col.d-flex.flex-column {
+    align-items: center;
+  }
+  .d-flex.align-center.mb-2 {
+    justify-content: center; /* centraliza a linha com logo + nome */
+  }
 }
+
 
 .v-footer {
   border-top: 1px solid #334155;
